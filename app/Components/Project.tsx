@@ -10,9 +10,9 @@ interface Project {
    location?: string;
    materials?: string[];
    dimensions?: {
-      height: number;
-      width: number;
-      depth: number;
+      height?: number;
+      width?: number;
+      depth?: number;
    };
    available?: boolean;
    tags?: string[];
