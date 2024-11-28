@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
 import Project from "./Components/Project";
+import { useUser } from "@auth0/nextjs-auth0/client";
 
 interface ProjectInterface {
    _id: string;
@@ -29,13 +30,15 @@ interface ProjectInterface {
 }
 
 export default function Home() {
+   const { user, error, isLoading } = useUser();
+
    const [project, setProject] = useState<ProjectInterface>({
       _id: "",
       title: "",
       description: "",
       price: 0,
       category: "",
-      creator: "",
+      creator: "test",
       location: "",
       materials: [],
       dimensions: {
@@ -81,6 +84,7 @@ export default function Home() {
    return (
       <div className="flex flex-col gap-5 p-12 items-center font-[family-name:var(--font-geist-sans)]">
          <div className="flex flex-col gap-1 h-80">
+            <h1 className="text-4xl">Hello {user ? user.name : "Guest"}!</h1>
             <input
                placeholder="Project Name"
                type="text"
@@ -114,14 +118,10 @@ export default function Home() {
             <input
                placeholder="Height"
                type="number"
-               value={project.dimensions?.width || ""}
                onChange={(e) =>
                   setProject({
                      ...project,
-                     dimensions: {
-                        ...project.dimensions,
-                        width: Number(e.target.value),
-                     },
+                     dimensions: { ...project.dimensions, height: parseInt(e.target.value) },
                   })
                }
             />
@@ -152,7 +152,7 @@ export default function Home() {
             />
          </div>
 
-         <button onClick={() => setNewProject(!newProject)}>New Project</button>
+         <button onClick={handleSubmit}>Create Project</button>
          <div className="">
             {projects.map((project: ProjectInterface) => (
                <Project key={project._id} {...project} />
