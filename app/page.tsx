@@ -28,9 +28,27 @@ interface ProjectInterface {
     reviews: string[];
   };
 }
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function Home() {
   const { user, error, isLoading } = useUser();
+
+  useEffect(() => {
+    if (user) {
+      console.log(user);
+      try {
+        axios.post(API_URL + "api/add-user", {
+          email: user.email,
+          name: user.name,
+          picture: user.picture,
+          auth0Id: user.sub,
+          nickname: user.nickname,
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  });
 
   const [project, setProject] = useState<ProjectInterface>({
     _id: "",
@@ -62,9 +80,7 @@ export default function Home() {
     // axios.get("localhost:3000/get-projects").then((res) => setProjects(res.data));
     try {
       const fetchData = async () => {
-        const response = await axios.get(
-          "http://localhost:3000/api/get-projects"
-        );
+        const response = await axios.get(API_URL + "api/get-projects");
         setProjects(response.data.data);
       };
       fetchData();
@@ -75,19 +91,70 @@ export default function Home() {
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post(
-        "http://localhost:3000/api/add-project",
-        {
-          project: project,
-        }
-      );
+      const response = await axios.post(API_URL + "api/add-project", {
+        project: project,
+      });
     } catch (error) {
       console.error(error);
     }
   };
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  const palettes = [
+    {
+      name: "Modern and Minimalist",
+      colors: ["#4A90E2", "#50E3C2", "#F5F5F5", "#D0021B"],
+    },
+    {
+      name: "Warm and Earthy",
+      colors: ["#8D6E63", "#FFD54F", "#FFF8E1", "#E64A19"],
+    },
+    {
+      name: "Vibrant and Playful",
+      colors: ["#FF6F61", "#6B5B95", "#F7CAC9", "#88B04B"],
+    },
+    {
+      name: "Cool and Professional",
+      colors: ["#34495E", "#2ECC71", "#ECF0F1", "#E74C3C"],
+    },
+    {
+      name: "Pastel and Soft",
+      colors: ["#f5fbf4", "#3d2c2b", "#9a5b23", "#f4a834", "#1e397a"],
+    },
+  ];
 
   return (
     <div className="flex flex-col gap-5 p-12 items-center font-[family-name:var(--font-geist-sans)]">
+      {palettes.map((palette, index) => (
+        <div key={index} style={{ marginBottom: "20px" }}>
+          <h3>{palette.name}</h3>
+          <div style={{ display: "flex", gap: "10px" }}>
+            {palette.colors.map((color, idx) => (
+              <div
+                key={idx}
+                style={{
+                  width: "50px",
+                  height: "50px",
+                  backgroundColor: color,
+                  border:
+                    color === "#F5F5F5" ||
+                    color === "#FFF8E1" ||
+                    color === "#FFFDD0"
+                      ? "1px solid #ccc"
+                      : "none",
+                }}
+              ></div>
+            ))}
+          </div>
+        </div>
+      ))}
       <div className="flex flex-col gap-1 h-80">
         <h1 className="text-4xl">Hello {user ? user.name : "Guest"}!</h1>
         <input
